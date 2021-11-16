@@ -1,0 +1,26 @@
+{
+  "name": "@uclatall/ckcode-learnosity-question",
+  "version": "0.0.1",
+  "description": "A custom Learnosity feature for a CKCode sandbox",
+  "main": "build/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "babel src -d build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/UCLATALL/ckcode-learnosity-question.git"
+  },
+  "author": "Adam Blake <adamblake@g.ucla.edu>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/UCLATALL/ckcode-learnosity-question/issues"
+  },
+  "homepage": "https://github.com/UCLATALL/ckcode-learnosity-question#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.16.0",
+    "@babel/core": "^7.16.0",
+    "@babel/preset-env": "^7.16.0",
+    "prettier": "^2.4.1"
+  }
+}
