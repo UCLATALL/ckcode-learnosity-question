@@ -45,7 +45,7 @@ LearnosityAmd.define(() => {
    */
   function CKCodeFeature(init) {
     const code_cells = document.querySelectorAll("code-cell");
-    const existing_ids = code_cells.map((element) => element.id);
+    const existing_ids = [...code_cells].map((element) => element.id);
     const id = init.feature.id ?? find_unique_id(existing_ids);
     if (init.feature.id && existing_ids.includes(init.feature.id)) {
       console.warn(
