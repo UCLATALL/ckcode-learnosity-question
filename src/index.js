@@ -41,7 +41,15 @@ LearnosityAmd.define(() => {
 
   /**
    * Construct the feature
-   * @param {{$el: JQuery, feature: { id?: string, extra_setup?: string, extra_prompt?: string }}} init
+   * @param {{
+   *   $el: JQuery,
+   *   events: { trigger: (name: string) => void },
+   *   feature: {
+   *     id?: string,
+   *     extra_setup?: string,
+   *     extra_prompt?: string
+   *   }
+   * }} init
    */
   function CKCodeFeature(init) {
     const code_cells = document.querySelectorAll("code-cell");
@@ -60,6 +68,8 @@ LearnosityAmd.define(() => {
         init.feature.extra_prompt ?? ""
       )
     );
+
+    init.events.trigger("ready");
   }
 
   return { Feature: CKCodeFeature };
