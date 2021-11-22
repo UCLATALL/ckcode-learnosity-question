@@ -25,92 +25,116 @@
 
 // noinspection JSUnresolvedVariable
 LearnosityAmd.define(["jquery-v1.10.2"], function ($) {
-  const dataCampScriptURL =
-    "//cdn.jsdelivr.net/gh/UCLATALL/datacamp-light@build/dist/dcl-react.js";
-  const getDataCampHTML = (extraPreExerciseCode, extraSampleCode) => `
-		<div data-datacamp-exercise data-lang="r" data-height="350" data-show-run-button="true" data-show-solution-before="false" data-no-lazy-load="true">
-			<code data-type="pre-exercise-code">
-				require(tidyverse)
-	            require(readr)
-	            require(mosaic)
-	            require(Lock5withR)
-	            require(fivethirtyeight)
-	            require(okcupiddata)
-	            require(supernova)
+  /**
+   * Build the CKCode sandbox HTML
+   * @param {string} id
+   * @param {string} extra_setup
+   * @param {string} extra_prompt
+   * @return {string}
+   */
+  const build_sandbox_html = (id, extra_setup = "", extra_prompt = "") => `
+    <code-cell id="${id}">
+      <code data-type="setup">
+        require(coursekata)
+        candy_rankings <- fivethirtyeight::candy_rankings %>%
+          mutate(nutty = peanutyalmondy, sugarpercent = sugarpercent * 100) %>%
+          select(competitorname, winpercent, chocolate, fruity, nutty, hard, bar, sugarpercent, pricepercent)
+        selfies <- readr::read_csv("https://docs.google.com/spreadsheets/d/1jqMg3-L4Z5bK5FCjCC2rv6Za4qzM5nq_Yn6k_rJmZ6M/export?format=csv")
+        ${extra_setup}
+      </code>
+      <code data-type="prompt">
+        ${extra_prompt}
+      </code>
+    </code-cell>
+  `;
 
-	            Fingers <- supernova::Fingers
-	            Servers <- supernova::Servers
-	            Survey <- supernova::Survey
-	            TipExperiment <- supernova::TipExperiment
-	            MindsetMatters <- Lock5Data::MindsetMatters
-	            HappyPlanetIndex <- Lock5Data::HappyPlanetIndex
-	            candy_rankings <- fivethirtyeight::candy_rankings %>%
-	                mutate(nutty = peanutyalmondy, sugarpercent = sugarpercent * 100) %>%
-	                select(competitorname, winpercent, chocolate, fruity, nutty, hard, bar, sugarpercent, pricepercent)
-	            selfies <- read_csv("https://docs.google.com/spreadsheets/d/1jqMg3-L4Z5bK5FCjCC2rv6Za4qzM5nq_Yn6k_rJmZ6M/export?format=csv")
-				${extraPreExerciseCode}
-			</code>
-			<code data-type="sample-code">
-				${extraSampleCode}
-			</code>
-			<code data-type="solution">
-			</code>
-			<code data-type="sct">
-			</code>
-			<div data-type="hint">All code you have used in class should work here as well.</div>
-		</div>
-	`;
+  /**
+   * Create a unique sandbox ID
+   * @param {string[]} existing_ids
+   * @return {string}
+   */
+  const find_unique_id = (existing_ids) => {
+    let counter = existing_ids.length;
+    let id = `sandbox-${counter}`;
+    while (existing_ids.includes(id)) {
+      counter += 1;
+      id = `sandbox-${counter}`;
+    }
+
+    return id;
+  };
+
+  // noinspection SpellCheckingInspection
+  const ckcode_bundle =
+    "//cdn.jsdelivr.net/gh/UCLATALL/ckcode-learnosity-question@1.0/build/ckcode.bundle.js";
 
   // lock to make sure we don't start loading the script from multiple instances at the same time
-  let loadingDCLScript = false;
+  let loading_script = false;
 
-  function DataCampFeature(init) {
+  /**
+   * Construct the feature
+   * @param {{
+   *   $el: JQuery,
+   *   events: { trigger: (name: string) => void },
+   *   feature: { id?: string, extra_setup?: string, extra_prompt?: string }
+   * }} init
+   */
+  function CKCodeFeature(init) {
+    const code_cells = document.querySelectorAll("code-cell");
+    const existing_ids = [...code_cells].map((element) => element.id);
+    const id = init.feature?.id ?? find_unique_id(existing_ids);
+    if (init.feature?.id && existing_ids.includes(init.feature.id)) {
+      console.warn(
+        `[ckcode-learnosity] The given ID ${init.feature.id} already exists. Using new ID "${id}"`
+      );
+    }
+
     init.$el.html(
-      getDataCampHTML(
-        init.feature.extraPreExerciseCode || "",
-        init.feature.extraSampleCode || ""
+      build_sandbox_html(
+        id,
+        init.feature?.extra_setup || "",
+        init.feature?.extra_prompt || ""
       )
     );
 
-    // only load the DCL script once, because double-loading it breaks them
-    // we check for the global initAddedDCLightExercises function to determine if DCL is already loaded
-    let dclAlreadyLoaded =
-      typeof window.initAddedDCLightExercises === "function";
+    // only load the ckcode script once -- check to see if the app is defined to see if it is already loaded
+    let already_loaded = typeof window.ckcode !== "undefined";
 
-    if (dclAlreadyLoaded) {
-      // DCL already loaded, so just initialize the new exercises added
-      window.initAddedDCLightExercises();
+    if (already_loaded) {
+      // CKCode already loaded, so just initialize the new exercises added
+      // noinspection JSUnresolvedFunction
+      window.ckcode.hookup_cells();
       init.events.trigger("ready");
-    } else if (loadingDCLScript) {
-      // somebody else is grabbing DCL, we can just chill
+    } else if (loading_script) {
+      // somebody else is grabbing the script, we can just chill
       init.events.trigger("ready");
     } else {
       // fetch the script if we're not already doing so (and lock so other instances don't try also)
-      loadingDCLScript = true;
+      loading_script = true;
 
       // caching is A-OK with us - we only _want_ to load the script once anyway
       return $.ajax({
         dataType: "script",
         cache: true,
-        url: dataCampScriptURL,
+        url: ckcode_bundle,
         success: function () {
-          console.log("Loaded DataCamp Light script sucessfully!");
+          console.log("[ckcode-learnosity] Loaded script successfully!");
           init.events.trigger("ready");
         },
         error: function (jqXHR, textStatus, errorThrown) {
           console.log(
-            "Error loading DataCamp Light script: ",
+            "[ckcode-learnosity] Error loading script: ",
             textStatus,
             errorThrown
           );
         },
         complete: function () {
           // whether we succeeded or failed, we're not trying anymore
-          loadingDCLScript = false;
+          loading_script = false;
         },
       });
     }
   }
 
-  return { Feature: DataCampFeature };
+  return { Feature: CKCodeFeature };
 });

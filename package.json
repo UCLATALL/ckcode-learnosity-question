@@ -2,12 +2,12 @@
   "name": "@uclatall/ckcode-learnosity-question",
   "version": "0.0.4",
   "description": "A custom Learnosity feature for a CKCode sandbox",
-  "main": "build/index.js",
+  "main": "build/learnosity-feature.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "rimraf build",
     "build": "npm run clean && npm run build:ckcode && npm run build:feature",
-    "build:feature": "babel src/index.js -d build",
+    "build:feature": "babel src/learnosity-feature.js -d build",
     "build:ckcode": "rollup -c"
   },
   "repository": {

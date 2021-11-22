@@ -1,1 +1,0 @@
-"use strict";LearnosityAmd.define(function(){function CKCodeFeature(init){var style=["min-width:600px","max-width:900px"].join(";");init.$el.html("<iframe src=\"https://uclatall.github.io/ckcode-sandbox\" style=\"".concat(style,"\">"));init.events.trigger("ready")}return{Feature:CKCodeFeature}});
