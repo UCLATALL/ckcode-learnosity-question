@@ -66,7 +66,7 @@ LearnosityAmd.define(["jquery-v1.10.2"], function ($) {
 
   // noinspection SpellCheckingInspection
   const ckcode_bundle =
-    "//cdn.jsdelivr.net/gh/UCLATALL/ckcode-learnosity-question@1.0/build/ckcode.bundle.js";
+    "//cdn.jsdelivr.net/gh/UCLATALL/ckcode-learnosity-question@1.0.0/build/ckcode.bundle.js";
 
   // lock to make sure we don't start loading the script from multiple instances at the same time
   let loading_script = false;
