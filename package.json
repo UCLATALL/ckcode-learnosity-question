@@ -1,18 +1,21 @@
 {
   "name": "@uclatall/ckcode-learnosity-question",
-  "version": "0.0.4",
+  "version": "1.0.0",
   "description": "A custom Learnosity feature for a CKCode sandbox",
-  "main": "build/index.js",
+  "main": "build/learnosity-feature.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "babel src -d build"
+    "clean": "rimraf build",
+    "build": "npm run clean && npm run build:ckcode && npm run build:feature",
+    "build:feature": "babel src/learnosity-feature.js -d build",
+    "build:ckcode": "rollup -c"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/UCLATALL/ckcode-learnosity-question.git"
   },
   "author": "Adam Blake <adamblake@g.ucla.edu>",
-  "license": "MIT",
+  "license": "UNLICENSED",
   "bugs": {
     "url": "https://github.com/UCLATALL/ckcode-learnosity-question/issues"
   },
@@ -21,6 +24,14 @@
     "@babel/cli": "^7.16.0",
     "@babel/core": "^7.16.0",
     "@babel/preset-env": "^7.16.0",
-    "prettier": "^2.4.1"
+    "@rollup/plugin-node-resolve": "^13.0.6",
+    "@rollup/plugin-replace": "^3.0.0",
+    "prettier": "^2.4.1",
+    "rimraf": "^3.0.2",
+    "rollup-plugin-svg": "^2.0.0",
+    "rollup-plugin-terser": "^7.0.2"
+  },
+  "dependencies": {
+    "@uclatall/ckcode": "^0.3.4"
   }
 }
